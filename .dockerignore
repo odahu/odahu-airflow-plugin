@@ -1,0 +1,9 @@
+**
+!Makefile
+!containers/**
+!legion
+!scripts
+!Pipfile
+!Pipfile.lock
+!setup.py
+!README.md
