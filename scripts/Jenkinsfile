@@ -78,7 +78,7 @@ pipeline {
                         if [ ! -d "legion-cicd" ]; then
                             git clone ${env.param_legion_cicd_repo} legion-cicd
                         fi
-                        cd legion-cicd && git checkout ${env.param_legion_cicd_branch}
+                        cd legion-cicd && git checkout ${env.param_legion_cicd_version_tag}
                         """
                     }
                     print ("Load legion pipeline common library")
