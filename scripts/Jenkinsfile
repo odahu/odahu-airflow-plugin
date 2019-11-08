@@ -256,13 +256,6 @@ pipeline {
 
     post {
         always {
-            script {
-                // import Legion components
-                dir("${WORKSPACE}/legion-cicd") {
-                    print ("Checkout Legion-infra repo")
-                    checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: "${env.param_legion_infra_repo}"]], branches: [[name: "refs/tags/${env.param_legion_infra_version_tag}"]]], poll: false
-                }
-            }
             deleteDir()
         }
     }
