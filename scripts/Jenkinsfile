@@ -23,10 +23,10 @@ pipeline {
             param_release_version = "${params.ReleaseVersion}"
             //Git Branch to build package from
             param_git_branch = "${params.GitBranch}"
-             //Legion Infra repo url (for pipeline methods import)
-            param_legion_infra_repo = "${params.LegionInfraRepo}"
-            //Legion repo version tag (tag or branch name)
-            param_legion_infra_version_tag = "${params.LegionInfraVersionTag}"
+            //Legion cicd repo url (for pipeline methods import)
+            param_legion_cicd_repo = "${params.LegionCicdRepo}"
+            //Legion cicd repo version tag (tag or branch name)
+            param_legion_cicd_version_tag = "${params.LegionCicdVersionTag}"
             //Push release git tag
             param_push_git_tag = "${params.PushGitTag}"
             //Rewrite git tag i exists
@@ -34,7 +34,7 @@ pipeline {
             //Push release to master bransh
             param_update_master = "${params.UpdateMaster}"
             //Upload legion python package to pypi
-            param_upload_legion_package = "${params.UploadLegionPackage}"
+            param_upload_legion_package_pypi= "${params.UploadPyPi}"
             //Set next releases version explicitly
             param_next_version = "${params.NextVersion}"
             // Update version string
@@ -45,7 +45,7 @@ pipeline {
             param_helm_repo_git_url = "${params.HelmRepoGitUrl}"
             param_helm_repo_git_branch = "${params.HelmRepoGitBranch}"
             param_helm_repository = "${params.HelmRepository}"
-            param_pypi_repository = "${params.PyPiRepository}"
+            param_pypi_repository = "${params.PyPiRepo}"
             param_local_pypi_distribution_target_name = "${params.LocalPyPiDistributionTargetName}"
             param_test_pypi_distribution_target_name = "${params.testPyPiDistributionTargetName}"
             param_public_pypi_distribution_target_name = "${params.PublicPyPiDistributionTargetName}"
@@ -55,10 +55,19 @@ pipeline {
             param_docker_registry = "${params.DockerRegistry}"
             param_docker_hub_registry = "${params.DockerHubRegistry}"
             param_git_deploy_key = "${params.GitDeployKey}"
+            param_legion_cicd_gitlab_key = "${params.legionCicdGitlabKey}"
             ///Job parameters
             updateVersionScript = "scripts/update_version_id"
-            sharedLibPath = "pipelines/legionPipeline.groovy"
+            sharedLibPath = "legion-cicd/pipelines/legionPipeline.groovy"
             pathToCharts= "${WORKSPACE}/helms"
+
+            // PyPi
+            param_pypi_public_url = "${params.PyPiPublicUrl}"
+            param_pypi_public_creds = "pypi_public_cred"
+            param_pypi_private_url = "${params.PyPiPrivateUrl}"
+            param_pypi_private_creds = "nexus-local-repository"
+            param_pypi_publishing_enabled = "${PyPiPublishingEnabled}"
+
     }
 
     stages {
@@ -70,18 +79,26 @@ pipeline {
                     sh 'echo RunningOn: $(curl http://checkip.amazonaws.com/)'
 
                     // import Legion components
-                    dir("${WORKSPACE}/legion-aws") {
-                        print ("Checkout Legion-infra repo")
-                        checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: "${env.param_legion_infra_repo}"]], branches: [[name: "refs/tags/${env.param_legion_infra_version_tag}"]]], poll: false
-
-                        print ("Load legion pipeline common library")
-                        legion = load "${env.sharedLibPath}"
+                    sshagent(["${env.legionCicdGitlabKey}"]) {
+                        sh"""#!/bin/bash -ex
+                        #TODO get repo url from passed parameters
+                        mkdir -p \$(getent passwd \$(whoami) | cut -d: -f6)/.ssh && ssh-keyscan git.epam.com >> \$(getent passwd \$(whoami) | cut -d: -f6)/.ssh/known_hosts
+                        if [ ! -d "legion-cicd" ]; then
+                            git clone ${env.param_legion_cicd_repo} legion-cicd
+                        fi
+                        cd legion-cicd && git checkout ${env.param_legion_cicd_version_tag}
+                        """
                     }
+                    print ("Load legion pipeline common library")
+                    legion = load "${env.sharedLibPath}"
 
                     print("Check code for security issues")
                     sh "bash scripts/install-git-secrets-hook.sh install_hooks && git secrets --scan -r"
 
-                    legion.setBuildMeta(env.updateVersionScript)
+                    verFiles = [
+                            "legion/airflow/__version__.py",
+                    ]
+                    legion.setBuildMeta(verFiles)
                 }
             }
         }
@@ -200,64 +217,10 @@ pipeline {
 //                         }
 //                     }
 //                 }
-                stage("Upload Legion package") {
+                stage("Upload PyPi Legion packages") {
                     steps {
                         script {
-                            docker.image("legion/legion-airflow-plugin-pipeline:${Globals.buildVersion}").inside() {
-                                withCredentials([[
-                                $class: 'UsernamePasswordMultiBinding',
-                                credentialsId: 'nexus-local-repository',
-                                usernameVariable: 'USERNAME',
-                                passwordVariable: 'PASSWORD']]) {
-                                sh """
-                                cat > /tmp/.pypirc << EOL
-                                [distutils]
-                                index-servers =
-                                  ${env.param_local_pypi_distribution_target_name}
-                                [${env.param_local_pypi_distribution_target_name}]
-                                repository=${env.param_pypi_repository.split('/').dropRight(1).join('/')}/
-                                username=${env.USERNAME}
-                                password=${env.PASSWORD}
-                                EOL
-                                """.stripIndent()
-                                }
-                                sh """
-                                cat /tmp/.pypirc
-                                twine upload -r ${env.param_local_pypi_distribution_target_name} --config-file /tmp/.pypirc '/opt/legion/dist/legion-*'
-                                """
-
-                                if (env.param_stable_release.toBoolean()) {
-                                    if (env.param_upload_legion_package.toBoolean()){
-                                        withCredentials([[
-                                        $class: 'UsernamePasswordMultiBinding',
-                                        credentialsId: 'pypi-repository',
-                                        usernameVariable: 'USERNAME',
-                                        passwordVariable: 'PASSWORD']]) {
-                                            sh """
-                                            cat > /tmp/.pypirc << EOL
-                                            [distutils]
-                                            index-servers =
-                                              ${env.param_test_pypi_distribution_target_name}
-                                              ${env.param_public_pypi_distribution_target_name}
-                                            [${env.param_test_pypi_distribution_target_name}]
-                                            repository=https://test.pypi.org/legacy/
-                                            username=${env.USERNAME}
-                                            password=${env.PASSWORD}
-                                            [${env.param_public_pypi_distribution_target_name}]
-                                            repository=https://upload.pypi.org/legacy/
-                                            username=${env.USERNAME}
-                                            password=${env.PASSWORD}
-                                            EOL
-                                            """.stripIndent()
-                                        }
-                                        sh """
-                                        twine upload -r ${env.param_pypi_distribution_target_name} --config-file /tmp/.pypirc '/opt/legion/dist/legion-*'
-                                        """
-                                    } else {
-                                        print("Skipping package upload")
-                                    }
-                                }
-                            }
+                            legion.publishPythonPackage("./", env.param_pypi_private_creds, env.param_pypi_private_url, env.param_pypi_publishing_enabled, env.param_pypi_public_creds, env.param_pypi_public_url)
                         }
                     }
                 }
@@ -295,7 +258,7 @@ pipeline {
         always {
             script {
                 // import Legion components
-                dir("${WORKSPACE}/legion-aws") {
+                dir("${WORKSPACE}/legion-cicd") {
                     print ("Checkout Legion-infra repo")
                     checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: "${env.param_legion_infra_repo}"]], branches: [[name: "refs/tags/${env.param_legion_infra_version_tag}"]]], poll: false
                 }

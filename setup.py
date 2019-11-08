@@ -58,10 +58,9 @@ setup(
         ]
     },
     install_requires=[
-        # TODO: consider Pipenv usage
-        # TODO: replace by release candidate version
+        # TODO: replace when we publish to pypi
         'legion-sdk==1.0.0-rc19',
         'requests>=2.22.0'
     ],
-    version='1.0.0rc2dev',
+    version=extract_version(),
 )
