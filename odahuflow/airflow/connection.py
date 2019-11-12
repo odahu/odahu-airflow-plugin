@@ -17,11 +17,11 @@
 from airflow.contrib.hooks.gcp_sql_hook import GCP_CREDENTIALS_KEYFILE_DICT
 from airflow.models import BaseOperator, Connection as AirflowConnection
 from airflow.utils.decorators import apply_defaults
-from legion.sdk.clients.connection import ConnectionClient
-from legion.sdk.clients.edi import WrongHttpStatusCode
-from legion.sdk.models import Connection
+from odahuflow.sdk.clients.connection import ConnectionClient
+from odahuflow.sdk.clients.edi import WrongHttpStatusCode
+from odahuflow.sdk.models import Connection
 
-from legion.airflow.edi import LegionHook
+from odahuflow.airflow.edi import LegionHook
 
 
 class GcpConnectionToLegionConnectionOperator(BaseOperator):

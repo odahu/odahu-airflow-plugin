@@ -17,12 +17,12 @@
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from legion.sdk.clients.edi import WrongHttpStatusCode
-from legion.sdk.clients.packaging import ModelPackagingClient, SUCCEEDED_STATE, FAILED_STATE
-from legion.sdk.models import ModelPackaging
+from odahuflow.sdk.clients.edi import WrongHttpStatusCode
+from odahuflow.sdk.clients.packaging import ModelPackagingClient, SUCCEEDED_STATE, FAILED_STATE
+from odahuflow.sdk.models import ModelPackaging
 
-from legion.airflow.edi import LegionHook
-from legion.airflow.training import XCOM_TRAINED_ARTIFACT_KEY
+from odahuflow.airflow.edi import LegionHook
+from odahuflow.airflow.training import XCOM_TRAINED_ARTIFACT_KEY
 
 XCOM_PACKAGING_RESULT_KEY = "packaging_result"
 

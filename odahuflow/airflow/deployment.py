@@ -18,12 +18,12 @@ import time
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from legion.sdk.clients.deployment import ModelDeploymentClient, READY_STATE, FAILED_STATE
-from legion.sdk.clients.edi import WrongHttpStatusCode
-from legion.sdk.models import ModelDeployment
+from odahuflow.sdk.clients.deployment import ModelDeploymentClient, READY_STATE, FAILED_STATE
+from odahuflow.sdk.clients.edi import WrongHttpStatusCode
+from odahuflow.sdk.models import ModelDeployment
 
-from legion.airflow.edi import LegionHook
-from legion.airflow.packaging import XCOM_PACKAGING_RESULT_KEY
+from odahuflow.airflow.edi import LegionHook
+from odahuflow.airflow.packaging import XCOM_PACKAGING_RESULT_KEY
 
 DEFAULT_WAIT_TIMEOUT = 5
 

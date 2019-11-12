@@ -18,10 +18,10 @@ import typing
 
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
-from legion.sdk.clients.deployment import ModelDeploymentClient
-from legion.sdk.clients.model import ModelClient
+from odahuflow.sdk.clients.deployment import ModelDeploymentClient
+from odahuflow.sdk.clients.model import ModelClient
 
-from legion.airflow.edi import LegionHook
+from odahuflow.airflow.edi import LegionHook
 
 
 class ModelPredictRequestOperator(BaseOperator):

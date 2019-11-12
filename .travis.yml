@@ -1,0 +1,19 @@
+language: python
+dist: bionic
+python: 3.6
+sudo: true
+install: skip
+jobs:
+  include:
+    - stage: security
+      before_script:
+        - sudo make install-vulnerabilities-checker
+      script:
+        - make check-vulnerabilities
+    - stage: unit tests and lint
+      before_script:
+        - make install
+        - make install-tests
+      script:
+        - make test
+        - make lint

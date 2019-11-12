@@ -20,14 +20,14 @@ import re
 from setuptools import setup, find_namespace_packages
 
 PACKAGE_ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
-VERSION_FILE = os.path.join(PACKAGE_ROOT_PATH, 'legion/airflow', '__version__.py')
+VERSION_FILE = os.path.join(PACKAGE_ROOT_PATH, 'odahuflow/airflow', '__version__.py')
 
 
 def extract_version() -> str:
     """
     Extract version from .py file using regex
 
-    :return: legion version
+    :return: odahuflow version
     """
     with open(VERSION_FILE, 'rt') as version_file:
         file_content = version_file.read()
@@ -40,27 +40,38 @@ def extract_version() -> str:
 
 
 setup(
-    name='legion-airflow-plugin',
-    author='Legion Platform Team',
+    name='odahuflow-airflow-plugin',
+    author='Vlad Tokarev, Vitalik Solodilov',
+    author_email='vlad.tokarev.94@gmail.com, mcdkr@yandex.ru',
     license='Apache v2',
     classifiers=[
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    keywords='airflow legion',
+    keywords='airflow odahuflow',
     python_requires='>=3.6',
     packages=find_namespace_packages(),
     data_files=[('', ["README.md"])],
     zip_safe=False,
     entry_points={
         'airflow.plugins': [
-            'legion = legion.airflow.plugin:LegionPlugin'
+            'odahuflow = odahuflow.airflow.plugin:LegionPlugin'
         ]
     },
     install_requires=[
-        # TODO: replace when we publish to pypi
-        'legion-sdk==1.0.0-rc19',
+        # TODO: change to PyPi when we publish release
+        'odahuflow-sdk @ git+https://github.com/odahu/odahu-flow@feat/1079-migration#egg=odahuflow-sdk&subdirectory=odahuFlow/sdk',
         'requests>=2.22.0'
     ],
+    extras_require={
+        'testing': [
+            'pytest>=5.1.2',
+            'pytest-mock>=1.10.4',
+            'pytest-cov>=2.7.1',
+            'pylint>=2.3.0',
+            'apache-airflow==1.10.2',
+            'google-api-python-client'
+        ]
+    },
     version=extract_version(),
 )
