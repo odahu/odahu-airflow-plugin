@@ -17,11 +17,10 @@
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from odahuflow.sdk.clients.edi import WrongHttpStatusCode
+from odahuflow.airflow.edi import LegionHook
+from odahuflow.sdk.clients.api import WrongHttpStatusCode
 from odahuflow.sdk.clients.training import ModelTrainingClient, TRAINING_SUCCESS_STATE, TRAINING_FAILED_STATE
 from odahuflow.sdk.models import ModelTraining
-
-from odahuflow.airflow.edi import LegionHook
 
 XCOM_TRAINED_ARTIFACT_KEY = "trained_artifact_name"
 
