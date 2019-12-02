@@ -40,7 +40,7 @@ def extract_version() -> str:
 
 
 setup(
-    name='odahuflow-airflow-plugin',
+    name='odahu-flow-airflow-plugin',
     author='Vlad Tokarev, Vitalik Solodilov',
     author_email='vlad.tokarev.94@gmail.com, mcdkr@yandex.ru',
     license='Apache v2',
@@ -60,7 +60,7 @@ setup(
     },
     install_requires=[
         # TODO: change to PyPi when we publish release
-        'odahuflow-sdk @ git+https://github.com/odahu/odahu-flow@feat/1079-migration#egg=odahuflow-sdk&subdirectory=odahuFlow/sdk',
+        'odahu-flow-sdk @ git+https://github.com/odahu/odahu-flow@feat/1079-migration#egg=odahuflow-sdk&subdirectory=odahuFlow/sdk',
         'requests>=2.22.0'
     ],
     extras_require={
