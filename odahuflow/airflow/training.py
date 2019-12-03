@@ -17,11 +17,10 @@
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from odahuflow.sdk.clients.edi import WrongHttpStatusCode
+from odahuflow.airflow.api import LegionHook
+from odahuflow.sdk.clients.api import WrongHttpStatusCode
 from odahuflow.sdk.clients.training import ModelTrainingClient, TRAINING_SUCCESS_STATE, TRAINING_FAILED_STATE
 from odahuflow.sdk.models import ModelTraining
-
-from odahuflow.airflow.edi import LegionHook
 
 XCOM_TRAINED_ARTIFACT_KEY = "trained_artifact_name"
 
@@ -31,20 +30,20 @@ class TrainingOperator(BaseOperator):
     @apply_defaults
     def __init__(self,
                  training: ModelTraining,
-                 edi_connection_id: str,
+                 api_connection_id: str,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.training = training
-        self.edi_connection_id = edi_connection_id
+        self.api_connection_id = api_connection_id
 
     def get_hook(self) -> LegionHook:
         return LegionHook(
-            self.edi_connection_id
+            self.api_connection_id
         )
 
     def execute(self, context):
-        client: ModelTrainingClient = self.get_hook().get_edi_client(ModelTrainingClient)
+        client: ModelTrainingClient = self.get_hook().get_api_client(ModelTrainingClient)
 
         try:
             if self.training.id:
@@ -63,20 +62,20 @@ class TrainingSensor(BaseSensorOperator):
     @apply_defaults
     def __init__(self,
                  training_id: str,
-                 edi_connection_id: str,
+                 api_connection_id: str,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.training_id = training_id
-        self.edi_connection_id = edi_connection_id
+        self.api_connection_id = api_connection_id
 
     def get_hook(self) -> LegionHook:
         return LegionHook(
-            self.edi_connection_id
+            self.api_connection_id
         )
 
     def poke(self, context):
-        client: ModelTrainingClient = self.get_hook().get_edi_client(ModelTrainingClient)
+        client: ModelTrainingClient = self.get_hook().get_api_client(ModelTrainingClient)
 
         train_status = client.get(self.training_id).status
 

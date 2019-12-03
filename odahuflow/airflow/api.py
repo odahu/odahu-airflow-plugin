@@ -25,29 +25,29 @@ from odahuflow.sdk.clients.route import ModelRouteClient
 
 class LegionHook(BaseHook):
 
-    def __init__(self, edi_connection_id=None, model_connection_id=None):
+    def __init__(self, api_connection_id=None, model_connection_id=None):
         super().__init__(None)
 
-        self.edi_connection_id = edi_connection_id
+        self.api_connection_id = api_connection_id
         self.model_connection_id = model_connection_id
 
-    def get_edi_client(self, target_client_class):
-        edi_conn = self.get_connection(self.edi_connection_id)
-        self.log.info(edi_conn)
+    def get_api_client(self, target_client_class):
+        api_conn = self.get_connection(self.api_connection_id)
+        self.log.info(api_conn)
 
-        return target_client_class(f'{edi_conn.schema}://{edi_conn.host}', self._get_token(edi_conn))
+        return target_client_class(f'{api_conn.schema}://{api_conn.host}', self._get_token(api_conn))
 
     def get_model_client(self, model_route_name: str) -> ModelClient:
-        edi_conn = self.get_connection(self.edi_connection_id)
-        self.log.info(edi_conn)
+        api_conn = self.get_connection(self.api_connection_id)
+        self.log.info(api_conn)
 
         model_conn = self.get_connection(self.model_connection_id)
         self.log.info(model_conn)
 
-        mr_client: ModelRouteClient = self.get_edi_client(ModelRouteClient)
+        mr_client: ModelRouteClient = self.get_api_client(ModelRouteClient)
         model_route = mr_client.get(model_route_name)
 
-        return ModelClient(model_route.status.edge_url, self._get_token(edi_conn))
+        return ModelClient(model_route.status.edge_url, self._get_token(api_conn))
 
     def _get_token(self, conn: Connection) -> str:
         """

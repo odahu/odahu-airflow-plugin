@@ -14,39 +14,39 @@
 #    limitations under the License.
 #
 
-from airflow.contrib.hooks.gcp_sql_hook import GCP_CREDENTIALS_KEYFILE_DICT
 from airflow.models import BaseOperator, Connection as AirflowConnection
 from airflow.utils.decorators import apply_defaults
+from odahuflow.airflow.api import LegionHook
+from odahuflow.sdk.clients.api import WrongHttpStatusCode
 from odahuflow.sdk.clients.connection import ConnectionClient
-from odahuflow.sdk.clients.edi import WrongHttpStatusCode
 from odahuflow.sdk.models import Connection
 
-from odahuflow.airflow.edi import LegionHook
+GCP_CREDENTIALS_KEYFILE_DICT = "extra__google_cloud_platform__keyfile_dict"
 
 
 class GcpConnectionToLegionConnectionOperator(BaseOperator):
 
     @apply_defaults
     def __init__(self,
-                 edi_connection_id: str,
+                 api_connection_id: str,
                  google_cloud_storage_conn_id: str,
                  conn_template: Connection,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.conn_template = conn_template
-        self.edi_connection_id = edi_connection_id
+        self.api_connection_id = api_connection_id
         self.google_cloud_storage_conn_id = google_cloud_storage_conn_id
 
     def get_hook(self) -> LegionHook:
         return LegionHook(
-            self.edi_connection_id
+            self.api_connection_id
         )
 
     def execute(self, context):
         gcp_conn: AirflowConnection = self.get_hook().get_connection(self.google_cloud_storage_conn_id)
         self.conn_template.spec.key_secret = gcp_conn.extra_dejson[GCP_CREDENTIALS_KEYFILE_DICT]
-        client: ConnectionClient = self.get_hook().get_edi_client(ConnectionClient)
+        client: ConnectionClient = self.get_hook().get_api_client(ConnectionClient)
 
         try:
             if self.conn_template.id:

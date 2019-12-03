@@ -21,7 +21,7 @@ from airflow.utils.decorators import apply_defaults
 from odahuflow.sdk.clients.deployment import ModelDeploymentClient
 from odahuflow.sdk.clients.model import ModelClient
 
-from odahuflow.airflow.edi import LegionHook
+from odahuflow.airflow.api import LegionHook
 
 
 class ModelPredictRequestOperator(BaseOperator):
@@ -29,7 +29,7 @@ class ModelPredictRequestOperator(BaseOperator):
     @apply_defaults
     def __init__(self,
                  model_deployment_name: str,
-                 edi_connection_id: str,
+                 api_connection_id: str,
                  model_connection_id: str,
                  request_body: typing.Any,
                  md_role_name: str = "",
@@ -39,12 +39,12 @@ class ModelPredictRequestOperator(BaseOperator):
         self.model_deployment_name = model_deployment_name
         self.request_body = request_body
         self.model_connection_id = model_connection_id
-        self.edi_connection_id = edi_connection_id
+        self.api_connection_id = api_connection_id
         self.md_role_name = md_role_name
 
     def get_hook(self) -> LegionHook:
         return LegionHook(
-            self.edi_connection_id,
+            self.api_connection_id,
             self.model_connection_id
         )
 
@@ -62,7 +62,7 @@ class ModelInfoRequestOperator(BaseOperator):
     @apply_defaults
     def __init__(self,
                  model_deployment_name: str,
-                 edi_connection_id: str,
+                 api_connection_id: str,
                  model_connection_id: str,
                  md_role_name: str = "",
                  *args, **kwargs):
@@ -70,12 +70,12 @@ class ModelInfoRequestOperator(BaseOperator):
 
         self.model_deployment_name = model_deployment_name
         self.model_connection_id = model_connection_id
-        self.edi_connection_id = edi_connection_id
+        self.api_connection_id = api_connection_id
         self.md_role_name = md_role_name
 
     def get_hook(self) -> LegionHook:
         return LegionHook(
-            self.edi_connection_id,
+            self.api_connection_id,
             self.model_connection_id
         )
 

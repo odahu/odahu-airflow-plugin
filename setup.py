@@ -59,8 +59,7 @@ setup(
         ]
     },
     install_requires=[
-        # TODO: change to PyPi when we publish release
-        'odahu-flow-sdk @ git+https://github.com/odahu/odahu-flow@feat/1079-migration#egg=odahuflow-sdk&subdirectory=odahuFlow/sdk',
+        'odahu-flow-sdk==1.0.0rc29',
         'requests>=2.22.0'
     ],
     extras_require={

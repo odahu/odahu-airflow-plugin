@@ -18,7 +18,7 @@ from airflow.plugins_manager import AirflowPlugin
 
 from odahuflow.airflow.connection import GcpConnectionToLegionConnectionOperator
 from odahuflow.airflow.deployment import DeploymentOperator, DeploymentSensor
-from odahuflow.airflow.edi import LegionHook
+from odahuflow.airflow.api import LegionHook
 from odahuflow.airflow.model import ModelPredictRequestOperator, ModelInfoRequestOperator
 from odahuflow.airflow.packaging import PackagingOperator, PackagingSensor
 from odahuflow.airflow.training import TrainingOperator, TrainingSensor
