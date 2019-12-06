@@ -24,7 +24,7 @@ from odahuflow.sdk.models import Connection
 GCP_CREDENTIALS_KEYFILE_DICT = "extra__google_cloud_platform__keyfile_dict"
 
 
-class GcpConnectionToLegionConnectionOperator(BaseOperator):
+class GcpConnectionToOdahuConnectionOperator(BaseOperator):
 
     @apply_defaults
     def __init__(self,

@@ -16,7 +16,7 @@
 
 from airflow.plugins_manager import AirflowPlugin
 
-from odahuflow.airflow.connection import GcpConnectionToLegionConnectionOperator
+from odahuflow.airflow.connection import GcpConnectionToOdahuConnectionOperator
 from odahuflow.airflow.deployment import DeploymentOperator, DeploymentSensor
 from odahuflow.airflow.api import LegionHook
 from odahuflow.airflow.model import ModelPredictRequestOperator, ModelInfoRequestOperator
@@ -27,6 +27,6 @@ from odahuflow.airflow.training import TrainingOperator, TrainingSensor
 class LegionPlugin(AirflowPlugin):
     name = 'odahuflow'
     operators = [TrainingOperator, DeploymentOperator, PackagingOperator, ModelPredictRequestOperator,
-                 ModelInfoRequestOperator, GcpConnectionToLegionConnectionOperator]
+                 ModelInfoRequestOperator, GcpConnectionToOdahuConnectionOperator]
     hooks = [LegionHook]
     sensors = [TrainingSensor, DeploymentSensor, PackagingSensor]
