@@ -23,7 +23,7 @@ from odahuflow.sdk.clients.model import ModelClient
 from odahuflow.sdk.clients.route import ModelRouteClient
 
 
-class LegionHook(BaseHook):  # pylint: disable=abstract-method
+class OdahuHook(BaseHook):  # pylint: disable=abstract-method
 
     def __init__(self, api_connection_id=None, model_connection_id=None):
         super().__init__(None)

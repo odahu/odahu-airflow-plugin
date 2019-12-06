@@ -18,15 +18,15 @@ from airflow.plugins_manager import AirflowPlugin
 
 from odahuflow.airflow_plugin.connection import GcpConnectionToOdahuConnectionOperator
 from odahuflow.airflow_plugin.deployment import DeploymentOperator, DeploymentSensor
-from odahuflow.airflow_plugin.api import LegionHook
+from odahuflow.airflow_plugin.api import OdahuHook
 from odahuflow.airflow_plugin.model import ModelPredictRequestOperator, ModelInfoRequestOperator
 from odahuflow.airflow_plugin.packaging import PackagingOperator, PackagingSensor
 from odahuflow.airflow_plugin.training import TrainingOperator, TrainingSensor
 
 
-class LegionPlugin(AirflowPlugin):
+class OdahuPlugin(AirflowPlugin):
     name = 'odahuflow'
     operators = [TrainingOperator, DeploymentOperator, PackagingOperator, ModelPredictRequestOperator,
                  ModelInfoRequestOperator, GcpConnectionToOdahuConnectionOperator]
-    hooks = [LegionHook]
+    hooks = [OdahuHook]
     sensors = [TrainingSensor, DeploymentSensor, PackagingSensor]

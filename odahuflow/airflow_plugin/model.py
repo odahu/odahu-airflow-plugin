@@ -20,7 +20,7 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from odahuflow.sdk.clients.model import ModelClient
 
-from odahuflow.airflow_plugin.api import LegionHook
+from odahuflow.airflow_plugin.api import OdahuHook
 
 
 class ModelPredictRequestOperator(BaseOperator):
@@ -41,8 +41,8 @@ class ModelPredictRequestOperator(BaseOperator):
         self.api_connection_id = api_connection_id
         self.md_role_name = md_role_name
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id,
             self.model_connection_id
         )
@@ -73,8 +73,8 @@ class ModelInfoRequestOperator(BaseOperator):
         self.api_connection_id = api_connection_id
         self.md_role_name = md_role_name
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id,
             self.model_connection_id
         )

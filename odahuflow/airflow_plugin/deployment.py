@@ -18,7 +18,7 @@ import time
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from odahuflow.airflow_plugin.api import LegionHook
+from odahuflow.airflow_plugin.api import OdahuHook
 from odahuflow.airflow_plugin.packaging import XCOM_PACKAGING_RESULT_KEY
 from odahuflow.sdk.clients.api import WrongHttpStatusCode
 from odahuflow.sdk.clients.deployment import ModelDeploymentClient, READY_STATE, FAILED_STATE
@@ -41,8 +41,8 @@ class DeploymentOperator(BaseOperator):
         self.api_connection_id = api_connection_id
         self.packaging_task_id = packaging_task_id
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id
         )
 
@@ -101,8 +101,8 @@ class DeploymentSensor(BaseSensorOperator):
         self.deployment_id = deployment_id
         self.api_connection_id = api_connection_id
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id
         )
 

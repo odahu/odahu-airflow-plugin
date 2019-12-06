@@ -17,7 +17,7 @@
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from odahuflow.airflow_plugin.api import LegionHook
+from odahuflow.airflow_plugin.api import OdahuHook
 from odahuflow.airflow_plugin.training import XCOM_TRAINED_ARTIFACT_KEY
 from odahuflow.sdk.clients.api import WrongHttpStatusCode
 from odahuflow.sdk.clients.packaging import ModelPackagingClient, SUCCEEDED_STATE, FAILED_STATE
@@ -40,8 +40,8 @@ class PackagingOperator(BaseOperator):
         self.api_connection_id = api_connection_id
         self.trained_task_id = trained_task_id
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id
         )
 
@@ -78,8 +78,8 @@ class PackagingSensor(BaseSensorOperator):
         self.packaging_id = packaging_id
         self.api_connection_id = api_connection_id
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id
         )
 

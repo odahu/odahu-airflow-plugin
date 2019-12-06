@@ -55,7 +55,7 @@ setup(
     zip_safe=False,
     entry_points={
         'airflow.plugins': [
-            'odahuflow = odahuflow.airflow_plugin.plugin:LegionPlugin'
+            'odahuflow = odahuflow.airflow_plugin.plugin:OdahuPlugin'
         ]
     },
     install_requires=[
