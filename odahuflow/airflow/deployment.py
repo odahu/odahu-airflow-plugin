@@ -107,6 +107,7 @@ class DeploymentSensor(BaseSensorOperator):
         )
 
     def poke(self, context):
+        # pylint: disable=unused-argument
         client: ModelDeploymentClient = self.get_hook().get_api_client(ModelDeploymentClient)
 
         dep_status = client.get(self.deployment_id).status

@@ -43,6 +43,7 @@ class TrainingOperator(BaseOperator):
         )
 
     def execute(self, context):
+        # pylint: disable=unused-argument
         client: ModelTrainingClient = self.get_hook().get_api_client(ModelTrainingClient)
 
         try:

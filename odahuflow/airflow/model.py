@@ -18,7 +18,6 @@ import typing
 
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
-from odahuflow.sdk.clients.deployment import ModelDeploymentClient
 from odahuflow.sdk.clients.model import ModelClient
 
 from odahuflow.airflow.api import LegionHook
@@ -49,6 +48,7 @@ class ModelPredictRequestOperator(BaseOperator):
         )
 
     def execute(self, context):
+        # pylint: disable=unused-argument
         model_client: ModelClient = self.get_hook().get_model_client(self.model_deployment_name)
 
         resp = model_client.invoke(**self.request_body)
@@ -80,6 +80,7 @@ class ModelInfoRequestOperator(BaseOperator):
         )
 
     def execute(self, context):
+        # pylint: disable=unused-argument
         model_client: ModelClient = self.get_hook().get_model_client(self.model_deployment_name)
 
         resp = model_client.info()
