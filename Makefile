@@ -39,10 +39,7 @@ all: help
 
 ## install: Install airflow-plugin python package
 install:
-	rm -rf build dist *.egg-info && \
-		pip3 install ${BUILD_PARAMS} -e . && \
-		python setup.py sdist && \
-		python setup.py bdist_wheel
+	pip3 install ${BUILD_PARAMS} -e .
 
 ## install-tests: Install test dependecies
 install-tests:
