@@ -17,7 +17,7 @@
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from odahuflow.airflow.api import LegionHook
+from odahuflow.airflow_plugin.api import OdahuHook
 from odahuflow.sdk.clients.api import WrongHttpStatusCode
 from odahuflow.sdk.clients.training import ModelTrainingClient, TRAINING_SUCCESS_STATE, TRAINING_FAILED_STATE
 from odahuflow.sdk.models import ModelTraining
@@ -37,12 +37,13 @@ class TrainingOperator(BaseOperator):
         self.training = training
         self.api_connection_id = api_connection_id
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id
         )
 
     def execute(self, context):
+        # pylint: disable=unused-argument
         client: ModelTrainingClient = self.get_hook().get_api_client(ModelTrainingClient)
 
         try:
@@ -69,8 +70,8 @@ class TrainingSensor(BaseSensorOperator):
         self.training_id = training_id
         self.api_connection_id = api_connection_id
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id
         )
 

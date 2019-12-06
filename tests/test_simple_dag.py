@@ -1,13 +1,15 @@
 from datetime import datetime
 
 from airflow import DAG
-from odahuflow.sdk.models import ModelTraining, ModelTrainingSpec, ModelIdentity, ResourceRequirements, ResourceList, \
-    ModelPackaging, ModelPackagingSpec, Target, ModelDeployment, ModelDeploymentSpec
+from airflow import settings
+from odahuflow.airflow_plugin.deployment import DeploymentOperator, DeploymentSensor
+from odahuflow.airflow_plugin.model import ModelPredictRequestOperator, ModelInfoRequestOperator
+from odahuflow.airflow_plugin.packaging import PackagingOperator, PackagingSensor
+from odahuflow.airflow_plugin.resources import resource
+from odahuflow.airflow_plugin.training import TrainingOperator, TrainingSensor
+from odahuflow.sdk.models import ModelDeployment, ModelDeploymentSpec
 
-from odahuflow.airflow.deployment import DeploymentOperator, DeploymentSensor
-from odahuflow.airflow.model import ModelPredictRequestOperator, ModelInfoRequestOperator
-from odahuflow.airflow.packaging import PackagingOperator, PackagingSensor
-from odahuflow.airflow.training import TrainingOperator, TrainingSensor
+RES_DIR = 'tests/resources'
 
 
 def test_hello_world():
@@ -20,42 +22,26 @@ def test_hello_world():
         'end_date': datetime(2099, 12, 31)
     }
 
-    edi_connection_id = "legion_edi"
-    model_connection_id = "legion_model"
+    odahu_connection_edi = "odahu_edi"
+    model_connection_id = "odahu_model"
 
-    training_id = "airlfow-tensorflow"
-    training = ModelTraining(
-        id=training_id,
-        spec=ModelTrainingSpec(
-            model=ModelIdentity(
-                name="tensorflow",
-                version="1.0"
-            ),
-            toolchain="mlflow",
-            entrypoint="main",
-            work_dir="mlflow/tensorflow/example",
-            resources=ResourceRequirements(
-                requests=ResourceList(
-                    cpu="2024m",
-                    memory="2024Mi"
-                ),
-                limits=ResourceList(
-                    cpu="2024m",
-                    memory="2024Mi"
-                )
-            ),
-            vcs_name="legion-examples"
-        ),
-    )
+    OLD_DAG_FOLDER = settings.DAGS_FOLDER
+    settings.DAGS_FOLDER = RES_DIR
+    try:
+        training_id, training = resource('training.odahuflow.yaml')
+    finally:
+        settings.DAGS_FOLDER = OLD_DAG_FOLDER
 
-    packaging_id = "airlfow-tensorflow"
-    packaging = ModelPackaging(
-        id=packaging_id,
-        spec=ModelPackagingSpec(
-            targets=[Target(name="docker-push", connection_name="docker-ci")],
-            integration_name="docker-rest"
-        ),
-    )
+    packaging_id, packaging = resource("""
+    id: airlfow-wine
+    kind: ModelPackaging
+    spec:
+      artifactName: "<fill-in>"
+      targets:
+        - connectionName: docker-ci
+          name: docker-push
+      integrationName: docker-rest
+    """)
 
     deployment_id = "airlfow-tensorflow"
     deployment = ModelDeployment(
@@ -82,7 +68,7 @@ def test_hello_world():
     with dag:
         train = TrainingOperator(
             task_id="training",
-            edi_connection_id=edi_connection_id,
+            api_connection_id=odahu_connection_edi,
             training=training,
             default_args=default_args
         )
@@ -90,13 +76,13 @@ def test_hello_world():
         wait_for_train = TrainingSensor(
             task_id='wait_for_training',
             training_id=training_id,
-            edi_connection_id=edi_connection_id,
+            api_connection_id=odahu_connection_edi,
             default_args=default_args
         )
 
         pack = PackagingOperator(
             task_id="packaging",
-            edi_connection_id=edi_connection_id,
+            api_connection_id=odahu_connection_edi,
             packaging=packaging,
             trained_task_id="wait_for_training",
             default_args=default_args
@@ -105,13 +91,13 @@ def test_hello_world():
         wait_for_pack = PackagingSensor(
             task_id='wait_for_packaging',
             packaging_id=packaging_id,
-            edi_connection_id=edi_connection_id,
+            api_connection_id=odahu_connection_edi,
             default_args=default_args
         )
 
         dep = DeploymentOperator(
             task_id="deployment",
-            edi_connection_id=edi_connection_id,
+            api_connection_id=odahu_connection_edi,
             deployment=deployment,
             packaging_task_id="wait_for_packaging",
             default_args=default_args
@@ -120,14 +106,14 @@ def test_hello_world():
         wait_for_dep = DeploymentSensor(
             task_id='wait_for_deployment',
             deployment_id=deployment_id,
-            edi_connection_id=edi_connection_id,
+            api_connection_id=odahu_connection_edi,
             default_args=default_args
         )
 
         model_predict_request = ModelPredictRequestOperator(
             task_id="model_predict_request",
             model_deployment_name=deployment_id,
-            edi_connection_id=edi_connection_id,
+            api_connection_id=odahu_connection_edi,
             model_connection_id=model_connection_id,
             request_body=model_example_request,
             default_args=default_args
@@ -136,11 +122,12 @@ def test_hello_world():
         model_info_request = ModelInfoRequestOperator(
             task_id='model_info_request',
             model_deployment_name=deployment_id,
-            edi_connection_id=edi_connection_id,
+            api_connection_id=odahu_connection_edi,
             model_connection_id=model_connection_id,
             default_args=default_args
         )
 
+        # pylint: disable=pointless-statement
         train >> wait_for_train >> pack >> wait_for_pack >> dep >> wait_for_dep
         wait_for_dep >> model_info_request
         wait_for_dep >> model_predict_request

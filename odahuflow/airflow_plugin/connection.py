@@ -16,7 +16,7 @@
 
 from airflow.models import BaseOperator, Connection as AirflowConnection
 from airflow.utils.decorators import apply_defaults
-from odahuflow.airflow.api import LegionHook
+from odahuflow.airflow_plugin.api import OdahuHook
 from odahuflow.sdk.clients.api import WrongHttpStatusCode
 from odahuflow.sdk.clients.connection import ConnectionClient
 from odahuflow.sdk.models import Connection
@@ -24,7 +24,7 @@ from odahuflow.sdk.models import Connection
 GCP_CREDENTIALS_KEYFILE_DICT = "extra__google_cloud_platform__keyfile_dict"
 
 
-class GcpConnectionToLegionConnectionOperator(BaseOperator):
+class GcpConnectionToOdahuConnectionOperator(BaseOperator):
 
     @apply_defaults
     def __init__(self,
@@ -38,8 +38,8 @@ class GcpConnectionToLegionConnectionOperator(BaseOperator):
         self.api_connection_id = api_connection_id
         self.google_cloud_storage_conn_id = google_cloud_storage_conn_id
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id
         )
 

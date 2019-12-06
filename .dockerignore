@@ -1,7 +1,6 @@
 **
 !Makefile
 !containers/**
-!legion
 !scripts
 !Pipfile
 !Pipfile.lock

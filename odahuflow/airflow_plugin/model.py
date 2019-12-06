@@ -18,10 +18,9 @@ import typing
 
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
-from odahuflow.sdk.clients.deployment import ModelDeploymentClient
 from odahuflow.sdk.clients.model import ModelClient
 
-from odahuflow.airflow.api import LegionHook
+from odahuflow.airflow_plugin.api import OdahuHook
 
 
 class ModelPredictRequestOperator(BaseOperator):
@@ -42,13 +41,14 @@ class ModelPredictRequestOperator(BaseOperator):
         self.api_connection_id = api_connection_id
         self.md_role_name = md_role_name
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id,
             self.model_connection_id
         )
 
     def execute(self, context):
+        # pylint: disable=unused-argument
         model_client: ModelClient = self.get_hook().get_model_client(self.model_deployment_name)
 
         resp = model_client.invoke(**self.request_body)
@@ -73,13 +73,14 @@ class ModelInfoRequestOperator(BaseOperator):
         self.api_connection_id = api_connection_id
         self.md_role_name = md_role_name
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
             self.api_connection_id,
             self.model_connection_id
         )
 
     def execute(self, context):
+        # pylint: disable=unused-argument
         model_client: ModelClient = self.get_hook().get_model_client(self.model_deployment_name)
 
         resp = model_client.info()
