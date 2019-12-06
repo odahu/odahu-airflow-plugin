@@ -20,7 +20,7 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from odahuflow.sdk.clients.model import ModelClient
 
-from odahuflow.airflow.api import LegionHook
+from odahuflow.airflow_plugin.api import LegionHook
 
 
 class ModelPredictRequestOperator(BaseOperator):

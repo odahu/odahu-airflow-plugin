@@ -16,12 +16,12 @@
 
 from airflow.plugins_manager import AirflowPlugin
 
-from odahuflow.airflow.connection import GcpConnectionToOdahuConnectionOperator
-from odahuflow.airflow.deployment import DeploymentOperator, DeploymentSensor
-from odahuflow.airflow.api import LegionHook
-from odahuflow.airflow.model import ModelPredictRequestOperator, ModelInfoRequestOperator
-from odahuflow.airflow.packaging import PackagingOperator, PackagingSensor
-from odahuflow.airflow.training import TrainingOperator, TrainingSensor
+from odahuflow.airflow_plugin.connection import GcpConnectionToOdahuConnectionOperator
+from odahuflow.airflow_plugin.deployment import DeploymentOperator, DeploymentSensor
+from odahuflow.airflow_plugin.api import LegionHook
+from odahuflow.airflow_plugin.model import ModelPredictRequestOperator, ModelInfoRequestOperator
+from odahuflow.airflow_plugin.packaging import PackagingOperator, PackagingSensor
+from odahuflow.airflow_plugin.training import TrainingOperator, TrainingSensor
 
 
 class LegionPlugin(AirflowPlugin):

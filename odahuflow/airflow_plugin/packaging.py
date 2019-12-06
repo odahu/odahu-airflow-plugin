@@ -17,25 +17,28 @@
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from odahuflow.airflow.api import LegionHook
+from odahuflow.airflow_plugin.api import LegionHook
+from odahuflow.airflow_plugin.training import XCOM_TRAINED_ARTIFACT_KEY
 from odahuflow.sdk.clients.api import WrongHttpStatusCode
-from odahuflow.sdk.clients.training import ModelTrainingClient, TRAINING_SUCCESS_STATE, TRAINING_FAILED_STATE
-from odahuflow.sdk.models import ModelTraining
+from odahuflow.sdk.clients.packaging import ModelPackagingClient, SUCCEEDED_STATE, FAILED_STATE
+from odahuflow.sdk.models import ModelPackaging
 
-XCOM_TRAINED_ARTIFACT_KEY = "trained_artifact_name"
+XCOM_PACKAGING_RESULT_KEY = "packaging_result"
 
 
-class TrainingOperator(BaseOperator):
+class PackagingOperator(BaseOperator):
 
     @apply_defaults
     def __init__(self,
-                 training: ModelTraining,
+                 packaging: ModelPackaging,
                  api_connection_id: str,
+                 trained_task_id: str = "",
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.training = training
+        self.packaging = packaging
         self.api_connection_id = api_connection_id
+        self.trained_task_id = trained_task_id
 
     def get_hook(self) -> LegionHook:
         return LegionHook(
@@ -43,31 +46,36 @@ class TrainingOperator(BaseOperator):
         )
 
     def execute(self, context):
-        # pylint: disable=unused-argument
-        client: ModelTrainingClient = self.get_hook().get_api_client(ModelTrainingClient)
+        client: ModelPackagingClient = self.get_hook().get_api_client(ModelPackagingClient)
 
         try:
-            if self.training.id:
-                client.delete(self.training.id)
+            if self.trained_task_id:
+                artifact_name = context['task_instance'].xcom_pull(task_ids=self.trained_task_id,
+                                                                   key=XCOM_TRAINED_ARTIFACT_KEY)
+                print(artifact_name)
+                self.packaging.spec.artifact_name = artifact_name
+
+            if self.packaging.id:
+                client.delete(self.packaging.id)
         except WrongHttpStatusCode as e:
             if e.status_code != 404:
                 raise e
 
-        train = client.create(self.training)
+        train = client.create(self.packaging)
 
         return train.id
 
 
-class TrainingSensor(BaseSensorOperator):
+class PackagingSensor(BaseSensorOperator):
 
     @apply_defaults
     def __init__(self,
-                 training_id: str,
+                 packaging_id: str,
                  api_connection_id: str,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.training_id = training_id
+        self.packaging_id = packaging_id
         self.api_connection_id = api_connection_id
 
     def get_hook(self) -> LegionHook:
@@ -76,16 +84,17 @@ class TrainingSensor(BaseSensorOperator):
         )
 
     def poke(self, context):
-        client: ModelTrainingClient = self.get_hook().get_api_client(ModelTrainingClient)
+        client: ModelPackagingClient = self.get_hook().get_api_client(ModelPackagingClient)
 
-        train_status = client.get(self.training_id).status
+        pack_status = client.get(self.packaging_id).status
 
-        if train_status.state == TRAINING_FAILED_STATE:
-            raise Exception(f'Model training {self.training_id} was failed')
+        if pack_status.state == FAILED_STATE:
+            raise Exception(f'Model packaging {self.packaging_id} was failed')
 
-        if train_status.state == TRAINING_SUCCESS_STATE:
-            context['task_instance'].xcom_push(key=XCOM_TRAINED_ARTIFACT_KEY,
-                                               value=train_status.artifacts[-1].artifact_name)
+        if pack_status.state == SUCCEEDED_STATE:
+            results = {result.name: result.value for result in pack_status.results}
+
+            context['task_instance'].xcom_push(XCOM_PACKAGING_RESULT_KEY, results)
 
             return True
 

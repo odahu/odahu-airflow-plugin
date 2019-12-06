@@ -18,8 +18,8 @@ import time
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from odahuflow.airflow.api import LegionHook
-from odahuflow.airflow.packaging import XCOM_PACKAGING_RESULT_KEY
+from odahuflow.airflow_plugin.api import LegionHook
+from odahuflow.airflow_plugin.packaging import XCOM_PACKAGING_RESULT_KEY
 from odahuflow.sdk.clients.api import WrongHttpStatusCode
 from odahuflow.sdk.clients.deployment import ModelDeploymentClient, READY_STATE, FAILED_STATE
 from odahuflow.sdk.models import ModelDeployment

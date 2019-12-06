@@ -20,7 +20,7 @@ import re
 from setuptools import setup, find_namespace_packages
 
 PACKAGE_ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
-VERSION_FILE = os.path.join(PACKAGE_ROOT_PATH, 'odahuflow/airflow', '__version__.py')
+VERSION_FILE = os.path.join(PACKAGE_ROOT_PATH, 'odahuflow/airflow_plugin', '__version__.py')
 
 
 def extract_version() -> str:
@@ -55,7 +55,7 @@ setup(
     zip_safe=False,
     entry_points={
         'airflow.plugins': [
-            'odahuflow = odahuflow.airflow.plugin:LegionPlugin'
+            'odahuflow = odahuflow.airflow_plugin.plugin:LegionPlugin'
         ]
     },
     install_requires=[

@@ -16,7 +16,7 @@
 
 from airflow.models import BaseOperator, Connection as AirflowConnection
 from airflow.utils.decorators import apply_defaults
-from odahuflow.airflow.api import LegionHook
+from odahuflow.airflow_plugin.api import LegionHook
 from odahuflow.sdk.clients.api import WrongHttpStatusCode
 from odahuflow.sdk.clients.connection import ConnectionClient
 from odahuflow.sdk.models import Connection

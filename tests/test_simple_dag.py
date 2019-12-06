@@ -2,14 +2,12 @@ from datetime import datetime
 
 from airflow import DAG
 from airflow import settings
-from odahuflow.airflow.deployment import DeploymentOperator, DeploymentSensor
-from odahuflow.airflow.model import ModelPredictRequestOperator, ModelInfoRequestOperator
-from odahuflow.airflow.packaging import PackagingOperator, PackagingSensor
-from odahuflow.airflow.resources import resource
-from odahuflow.airflow.training import TrainingOperator, TrainingSensor
-from odahuflow.sdk.models import ModelTraining, ModelTrainingSpec, ModelIdentity, ResourceRequirements, ResourceList, \
-    ModelDeployment, ModelDeploymentSpec
-
+from odahuflow.airflow_plugin.deployment import DeploymentOperator, DeploymentSensor
+from odahuflow.airflow_plugin.model import ModelPredictRequestOperator, ModelInfoRequestOperator
+from odahuflow.airflow_plugin.packaging import PackagingOperator, PackagingSensor
+from odahuflow.airflow_plugin.resources import resource
+from odahuflow.airflow_plugin.training import TrainingOperator, TrainingSensor
+from odahuflow.sdk.models import ModelDeployment, ModelDeploymentSpec
 
 RES_DIR = 'tests/resources'
 
@@ -129,6 +127,7 @@ def test_hello_world():
             default_args=default_args
         )
 
+        # pylint: disable=pointless-statement
         train >> wait_for_train >> pack >> wait_for_pack >> dep >> wait_for_dep
         wait_for_dep >> model_info_request
         wait_for_dep >> model_predict_request

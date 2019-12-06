@@ -17,28 +17,25 @@
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from odahuflow.airflow.api import LegionHook
-from odahuflow.airflow.training import XCOM_TRAINED_ARTIFACT_KEY
+from odahuflow.airflow_plugin.api import LegionHook
 from odahuflow.sdk.clients.api import WrongHttpStatusCode
-from odahuflow.sdk.clients.packaging import ModelPackagingClient, SUCCEEDED_STATE, FAILED_STATE
-from odahuflow.sdk.models import ModelPackaging
+from odahuflow.sdk.clients.training import ModelTrainingClient, TRAINING_SUCCESS_STATE, TRAINING_FAILED_STATE
+from odahuflow.sdk.models import ModelTraining
 
-XCOM_PACKAGING_RESULT_KEY = "packaging_result"
+XCOM_TRAINED_ARTIFACT_KEY = "trained_artifact_name"
 
 
-class PackagingOperator(BaseOperator):
+class TrainingOperator(BaseOperator):
 
     @apply_defaults
     def __init__(self,
-                 packaging: ModelPackaging,
+                 training: ModelTraining,
                  api_connection_id: str,
-                 trained_task_id: str = "",
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.packaging = packaging
+        self.training = training
         self.api_connection_id = api_connection_id
-        self.trained_task_id = trained_task_id
 
     def get_hook(self) -> LegionHook:
         return LegionHook(
@@ -46,36 +43,31 @@ class PackagingOperator(BaseOperator):
         )
 
     def execute(self, context):
-        client: ModelPackagingClient = self.get_hook().get_api_client(ModelPackagingClient)
+        # pylint: disable=unused-argument
+        client: ModelTrainingClient = self.get_hook().get_api_client(ModelTrainingClient)
 
         try:
-            if self.trained_task_id:
-                artifact_name = context['task_instance'].xcom_pull(task_ids=self.trained_task_id,
-                                                                   key=XCOM_TRAINED_ARTIFACT_KEY)
-                print(artifact_name)
-                self.packaging.spec.artifact_name = artifact_name
-
-            if self.packaging.id:
-                client.delete(self.packaging.id)
+            if self.training.id:
+                client.delete(self.training.id)
         except WrongHttpStatusCode as e:
             if e.status_code != 404:
                 raise e
 
-        train = client.create(self.packaging)
+        train = client.create(self.training)
 
         return train.id
 
 
-class PackagingSensor(BaseSensorOperator):
+class TrainingSensor(BaseSensorOperator):
 
     @apply_defaults
     def __init__(self,
-                 packaging_id: str,
+                 training_id: str,
                  api_connection_id: str,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.packaging_id = packaging_id
+        self.training_id = training_id
         self.api_connection_id = api_connection_id
 
     def get_hook(self) -> LegionHook:
@@ -84,17 +76,16 @@ class PackagingSensor(BaseSensorOperator):
         )
 
     def poke(self, context):
-        client: ModelPackagingClient = self.get_hook().get_api_client(ModelPackagingClient)
+        client: ModelTrainingClient = self.get_hook().get_api_client(ModelTrainingClient)
 
-        pack_status = client.get(self.packaging_id).status
+        train_status = client.get(self.training_id).status
 
-        if pack_status.state == FAILED_STATE:
-            raise Exception(f'Model packaging {self.packaging_id} was failed')
+        if train_status.state == TRAINING_FAILED_STATE:
+            raise Exception(f'Model training {self.training_id} was failed')
 
-        if pack_status.state == SUCCEEDED_STATE:
-            results = {result.name: result.value for result in pack_status.results}
-
-            context['task_instance'].xcom_push(XCOM_PACKAGING_RESULT_KEY, results)
+        if train_status.state == TRAINING_SUCCESS_STATE:
+            context['task_instance'].xcom_push(key=XCOM_TRAINED_ARTIFACT_KEY,
+                                               value=train_status.artifacts[-1].artifact_name)
 
             return True
 
