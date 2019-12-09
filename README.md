@@ -14,10 +14,10 @@ An apache airflow plugin for the Odahu Platform.
     * `type`: http
     * `host`: edge.cluster-name.ailifecycle.org
     * `schema`: https
-* `odahu_edi`
+* `odahu_api`
     * `id`: odahu_edi
     * `type`: http
-    * `host`: edi.cluster-name.ailifecycle.org
+    * `host`: odahu.cluster-name.ailifecycle.org
     * `schema`: https
     * `login`: ****
     * `password`: ****
@@ -28,4 +28,3 @@ An apache airflow plugin for the Odahu Platform.
 ### DEV notes
 
 1. We need a custom Airflow Connection - or maybe [this one](https://github.com/eliiza/airflow-oauth2) will work.
-1. This plugin uses Poetry instead of Pip for dependency resolution **AND** depends upon a local build of odahu-sdk. Both of these are because airflow has an irresolvable dependency issue with Jinja2. The workaround is to revert odahu's sdk Pipfile to "jinja2==2.10.0" and update your localenv with the non-conflicting version. 

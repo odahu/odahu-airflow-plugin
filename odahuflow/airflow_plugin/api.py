@@ -53,7 +53,7 @@ class OdahuHook(BaseHook):  # pylint: disable=abstract-method
         """
         Authorize test user and get access token.
 
-        :param Airlfow EDI connection TODO: add example configuration
+        :param Airlfow API connection
         :return: access token
         """
         extra = json.loads(conn.extra)

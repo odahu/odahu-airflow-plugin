@@ -22,7 +22,7 @@ def test_hello_world():
         'end_date': datetime(2099, 12, 31)
     }
 
-    odahu_connection_edi = "odahu_edi"
+    odahu_connection_api = "odahu_api"
     model_connection_id = "odahu_model"
 
     OLD_DAG_FOLDER = settings.DAGS_FOLDER
@@ -68,7 +68,7 @@ def test_hello_world():
     with dag:
         train = TrainingOperator(
             task_id="training",
-            api_connection_id=odahu_connection_edi,
+            api_connection_id=odahu_connection_api,
             training=training,
             default_args=default_args
         )
@@ -76,13 +76,13 @@ def test_hello_world():
         wait_for_train = TrainingSensor(
             task_id='wait_for_training',
             training_id=training_id,
-            api_connection_id=odahu_connection_edi,
+            api_connection_id=odahu_connection_api,
             default_args=default_args
         )
 
         pack = PackagingOperator(
             task_id="packaging",
-            api_connection_id=odahu_connection_edi,
+            api_connection_id=odahu_connection_api,
             packaging=packaging,
             trained_task_id="wait_for_training",
             default_args=default_args
@@ -91,13 +91,13 @@ def test_hello_world():
         wait_for_pack = PackagingSensor(
             task_id='wait_for_packaging',
             packaging_id=packaging_id,
-            api_connection_id=odahu_connection_edi,
+            api_connection_id=odahu_connection_api,
             default_args=default_args
         )
 
         dep = DeploymentOperator(
             task_id="deployment",
-            api_connection_id=odahu_connection_edi,
+            api_connection_id=odahu_connection_api,
             deployment=deployment,
             packaging_task_id="wait_for_packaging",
             default_args=default_args
@@ -106,14 +106,14 @@ def test_hello_world():
         wait_for_dep = DeploymentSensor(
             task_id='wait_for_deployment',
             deployment_id=deployment_id,
-            api_connection_id=odahu_connection_edi,
+            api_connection_id=odahu_connection_api,
             default_args=default_args
         )
 
         model_predict_request = ModelPredictRequestOperator(
             task_id="model_predict_request",
             model_deployment_name=deployment_id,
-            api_connection_id=odahu_connection_edi,
+            api_connection_id=odahu_connection_api,
             model_connection_id=model_connection_id,
             request_body=model_example_request,
             default_args=default_args
@@ -122,7 +122,7 @@ def test_hello_world():
         model_info_request = ModelInfoRequestOperator(
             task_id='model_info_request',
             model_deployment_name=deployment_id,
-            api_connection_id=odahu_connection_edi,
+            api_connection_id=odahu_connection_api,
             model_connection_id=model_connection_id,
             default_args=default_args
         )
