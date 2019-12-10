@@ -18,12 +18,11 @@ import time
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from legion.sdk.clients.deployment import ModelDeploymentClient, READY_STATE, FAILED_STATE
-from legion.sdk.clients.edi import WrongHttpStatusCode
-from legion.sdk.models import ModelDeployment
-
-from legion.airflow.edi import LegionHook
-from legion.airflow.packaging import XCOM_PACKAGING_RESULT_KEY
+from odahuflow.airflow_plugin.api import OdahuHook
+from odahuflow.airflow_plugin.packaging import XCOM_PACKAGING_RESULT_KEY
+from odahuflow.sdk.clients.api import WrongHttpStatusCode
+from odahuflow.sdk.clients.deployment import ModelDeploymentClient, READY_STATE, FAILED_STATE
+from odahuflow.sdk.models import ModelDeployment
 
 DEFAULT_WAIT_TIMEOUT = 5
 
@@ -33,22 +32,22 @@ class DeploymentOperator(BaseOperator):
     @apply_defaults
     def __init__(self,
                  deployment: ModelDeployment,
-                 edi_connection_id: str,
+                 api_connection_id: str,
                  packaging_task_id: str = "",
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.deployment = deployment
-        self.edi_connection_id = edi_connection_id
+        self.api_connection_id = api_connection_id
         self.packaging_task_id = packaging_task_id
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
-            self.edi_connection_id
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
+            self.api_connection_id
         )
 
     def execute(self, context):
-        client: ModelDeploymentClient = self.get_hook().get_edi_client(ModelDeploymentClient)
+        client: ModelDeploymentClient = self.get_hook().get_api_client(ModelDeploymentClient)
 
         try:
             if self.packaging_task_id:
@@ -95,20 +94,21 @@ class DeploymentSensor(BaseSensorOperator):
     @apply_defaults
     def __init__(self,
                  deployment_id: str,
-                 edi_connection_id: str,
+                 api_connection_id: str,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.deployment_id = deployment_id
-        self.edi_connection_id = edi_connection_id
+        self.api_connection_id = api_connection_id
 
-    def get_hook(self) -> LegionHook:
-        return LegionHook(
-            self.edi_connection_id
+    def get_hook(self) -> OdahuHook:
+        return OdahuHook(
+            self.api_connection_id
         )
 
     def poke(self, context):
-        client: ModelDeploymentClient = self.get_hook().get_edi_client(ModelDeploymentClient)
+        # pylint: disable=unused-argument
+        client: ModelDeploymentClient = self.get_hook().get_api_client(ModelDeploymentClient)
 
         dep_status = client.get(self.deployment_id).status
 
