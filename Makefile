@@ -63,8 +63,14 @@ check-vulnerabilities:
 	./scripts/install-git-secrets-hook.sh install_hooks
 	git secrets --scan -r
 
+## create-conn-var: Create variables and connections in airflow that are required to use odahuflow dags
+create-conn-var:
+	./scripts/create-conn-var.sh
+
 ## help: Show the help message
 help: Makefile
 	@echo "Choose a command run in "$(PROJECTNAME)":"
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sort | sed -e 's/\\$$//' | sed -e 's/##//'
 	@echo
+
+
