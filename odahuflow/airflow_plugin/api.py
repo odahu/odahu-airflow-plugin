@@ -64,11 +64,9 @@ class OdahuHook(BaseHook):  # pylint: disable=abstract-method
             response = requests.post(
                 auth_url,
                 data={
-                    'grant_type': 'password',
+                    'grant_type': 'client_credentials',
                     'client_id': extra["client_id"],
                     'client_secret': extra["client_secret"],
-                    'username': conn.login,
-                    'password': conn.password,
                     'scope': extra['scope']
                 }
             )

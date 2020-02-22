@@ -59,7 +59,7 @@ setup(
         ]
     },
     install_requires=[
-        'odahu-flow-sdk==1.0.0rc32',
+        'odahu-flow-sdk==1.1.0rc9',
         'requests>=2.22.0',
         # because this package is in conflict of odahu-flow-sdk and requests but pip doesn't have true dependency
         # resolver (https://github.com/pypa/pip/issues/988)
