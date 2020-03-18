@@ -106,6 +106,15 @@ pipeline {
             }
         }
 
+        stage("Build Airflow Docker image") {
+            steps {
+                script {
+                    cicdLibrary.buildDockerImage('odahu-airflow', ".", "containers/airflow/Dockerfile")
+                    cicdLibrary.uploadDockerImage('odahu-airflow', true)
+                }
+            }
+        }
+
         stage("Update branch") {
             steps {
                 script {
