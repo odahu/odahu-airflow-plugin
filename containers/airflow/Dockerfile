@@ -7,6 +7,7 @@ ENV TERM linux
 # Airflow
 ARG AIRFLOW_VERSION=1.10.9
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
+ARG PIP_EXTRA_INDEX_URL=""
 ARG AIRFLOW_DEPS=""
 ARG PYTHON_DEPS=""
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
@@ -63,9 +64,11 @@ RUN set -ex \
         /usr/share/doc \
         /usr/share/doc-base
 
-COPY script/entrypoint.sh /entrypoint.sh
-COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
-RUN rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/t*.py && \
+COPY /containers/airflow/entrypoint.sh /entrypoint.sh
+COPY /containers/airflow/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
+COPY /containers/airflow/pip.conf ${AIRFLOW_USER_HOME}/.config/pip/pip.conf
+RUN sed -ie "s/PIP_EXTRA_INDEX_URL/${PIP_EXTRA_INDEX_URL}/" ${AIRFLOW_USER_HOME}/.config/pip/pip.conf && \
+    rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/t*.py && \
     rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/docker*.py && \
     rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/example*.py && \
     rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/__pycache__/t*.pyc && \
