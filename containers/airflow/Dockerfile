@@ -64,17 +64,17 @@ RUN set -ex \
         /usr/share/doc \
         /usr/share/doc-base
 
-COPY /containers/airflow/entrypoint.sh /entrypoint.sh
-COPY /containers/airflow/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
-COPY /containers/airflow/pip.conf ${AIRFLOW_USER_HOME}/.config/pip/pip.conf
-RUN sed -ie "s/PIP_EXTRA_INDEX_URL/${PIP_EXTRA_INDEX_URL}/" ${AIRFLOW_USER_HOME}/.config/pip/pip.conf && \
+COPY containers/airflow/entrypoint.sh /entrypoint.sh
+COPY containers/airflow/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
+COPY containers/airflow/pip.conf ${AIRFLOW_USER_HOME}/.config/pip/pip.conf
+RUN sed -i "s|PIP_EXTRA_INDEX_URL|${PIP_EXTRA_INDEX_URL}|" ${AIRFLOW_USER_HOME}/.config/pip/pip.conf && \
     rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/t*.py && \
     rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/docker*.py && \
     rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/example*.py && \
     rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/__pycache__/t*.pyc && \
     rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/__pycache__/docker*.pyc && \
     rm /usr/local/lib/python3.7/site-packages/airflow/example_dags/__pycache__/example*.pyc
-COPY health_check.py /usr/local/lib/python3.7/site-packages/airflow/example_dags/
+COPY containers/airflow/health_check.py /usr/local/lib/python3.7/site-packages/airflow/example_dags/
 
 RUN chown -R airflow: ${AIRFLOW_USER_HOME}
 
