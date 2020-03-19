@@ -109,7 +109,7 @@ pipeline {
         stage("Build Airflow Docker image") {
             steps {
                 script {
-                    cicdLibrary.buildDockerImage('odahu-airflow', ".", "containers/airflow/Dockerfile")
+                    cicdLibrary.buildDockerImage('odahu-airflow', ".", "containers/airflow/Dockerfile", "--build-arg AIRFLOW_DEPS=\"kubernetes,gcp,aws,azure,crypto,google_auth,postgres\" --build-arg PYTHON_DEPS=\"odahu-flow-airflow-plugin==${Globals.buildVersion}\"")
                     cicdLibrary.uploadDockerImage('odahu-airflow', true)
                 }
             }
