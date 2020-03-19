@@ -42,6 +42,7 @@ pipeline {
         Docker
         */
         param_enable_docker_cache = "false"
+        param_docker_registry = "${params.DockerRegistry}"
 
         /*
         CICD repository
