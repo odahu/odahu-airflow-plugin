@@ -42,6 +42,7 @@ pipeline {
         Docker
         */
         param_enable_docker_cache = "false"
+        param_docker_registry = "${params.DockerRegistry}"
 
         /*
         CICD repository
@@ -102,6 +103,15 @@ pipeline {
                             cicdLibrary.publishPythonPackage("./", env.param_pypi_private_creds, env.param_pypi_private_url, env.param_pypi_publishing_enabled, env.param_pypi_public_creds, env.param_pypi_public_url)
                         }
                     }
+                }
+            }
+        }
+
+        stage("Build Airflow Docker image") {
+            steps {
+                script {
+                    cicdLibrary.buildDockerImage('odahu-airflow', ".", "containers/airflow/Dockerfile", "--build-arg AIRFLOW_DEPS=\"kubernetes,gcp,aws,azure,crypto,google_auth,postgres\" --build-arg PYTHON_DEPS=\"odahu-flow-airflow-plugin==${Globals.buildVersion}\"")
+                    cicdLibrary.uploadDockerImage('odahu-airflow', env.param_stable_release.toBoolean())
                 }
             }
         }
