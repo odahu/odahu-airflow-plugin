@@ -43,6 +43,9 @@ pipeline {
         */
         param_enable_docker_cache = "false"
         param_docker_registry = "${params.DockerRegistry}"
+        param_dockerhub_publishing_enabled = "${params.DockerHubPublishingEnabled}"
+        param_docker_hub_registry = "${params.DockerHubRegistry}"
+        param_docker_cache_source = "${params.DockerCacheSource}"
 
         /*
         CICD repository
@@ -111,7 +114,7 @@ pipeline {
             steps {
                 script {
                     cicdLibrary.buildDockerImage('odahu-airflow', ".", "containers/airflow/Dockerfile", "--build-arg AIRFLOW_DEPS=\"kubernetes,gcp,aws,azure,crypto,google_auth,postgres\" --build-arg PYTHON_DEPS=\"odahu-flow-airflow-plugin==${Globals.buildVersion}\"")
-                    cicdLibrary.uploadDockerImage('odahu-airflow', env.param_stable_release.toBoolean())
+                    cicdLibrary.uploadDockerImage('odahu-airflow', env.param_stable_release.toBoolean() && env.param_dockerhub_publishing_enabled.toBoolean())
                 }
             }
         }
