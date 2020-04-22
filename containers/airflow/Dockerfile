@@ -45,11 +45,7 @@ RUN set -ex \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
     && useradd -ms /bin/bash -d ${AIRFLOW_USER_HOME} airflow \
-    && pip install -U pip setuptools wheel \
-    && pip install pytz pyOpenSSL ndg-httpsclient pyasn1 \
-       apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
-    && pip install 'redis==3.2' 'SQLAlchemy==1.3.15'\
-    && if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi \
+    && pip install -U pip setuptools wheel pipenv \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get autoremove -yqq --purge \
     && apt-get clean \
@@ -60,6 +56,10 @@ RUN set -ex \
         /usr/share/man \
         /usr/share/doc \
         /usr/share/doc-base
+
+COPY Pipfile Pipfile.lock ./
+RUN  pipenv install --system --three --dev
+RUN  if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi
 
 COPY containers/airflow/entrypoint.sh /entrypoint.sh
 COPY containers/airflow/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
