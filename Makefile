@@ -54,6 +54,10 @@ lint:
 test:
 	pytest tests
 
+## docker-build-airflow: Build Airflow docker image
+docker-build-airflow:
+	docker build -t odahu/odahu-airflow:${BUILD_TAG} -f containers/airflow/Dockerfile .
+
 ## install-vulnerabilities-checker: Install the vulnerabilities-checker
 install-vulnerabilities-checker:
 	./scripts/install-git-secrets-hook.sh install_binaries
