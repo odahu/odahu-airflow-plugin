@@ -20,7 +20,7 @@ import requests
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Connection
 from odahuflow.sdk.clients.model import ModelClient
-from odahuflow.sdk.clients.route import ModelRouteClient
+from odahuflow.sdk.clients.deployment import ModelDeploymentClient
 
 
 class OdahuHook(BaseHook):  # pylint: disable=abstract-method
@@ -37,15 +37,15 @@ class OdahuHook(BaseHook):  # pylint: disable=abstract-method
 
         return target_client_class(f'{api_conn.schema}://{api_conn.host}', self._get_token(api_conn))
 
-    def get_model_client(self, model_route_name: str) -> ModelClient:
+    def get_model_client(self, deployment_name: str) -> ModelClient:
         api_conn = self.get_connection(self.api_connection_id)
         self.log.info(api_conn)
 
         model_conn = self.get_connection(self.model_connection_id)
         self.log.info(model_conn)
 
-        mr_client: ModelRouteClient = self.get_api_client(ModelRouteClient)
-        model_route = mr_client.get(model_route_name)
+        md_client: ModelDeploymentClient = self.get_api_client(ModelDeploymentClient)
+        model_route = md_client.get_default_route(deployment_name)
 
         return ModelClient(model_route.status.edge_url, self._get_token(api_conn))
 

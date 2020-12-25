@@ -39,7 +39,8 @@ all: help
 
 ## install: Install airflow-plugin python package
 install:
-	pip3 install ${BUILD_PARAMS} -e .
+	pip install --upgrade pip
+	pip install ${BUILD_PARAMS} -e . --use-feature=2020-resolver
 
 ## install-tests: Install test dependecies
 install-tests:
