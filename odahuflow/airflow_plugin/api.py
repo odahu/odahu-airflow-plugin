@@ -20,7 +20,6 @@ import requests
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Connection
 from odahuflow.sdk.clients.model import ModelClient
-from odahuflow.sdk.clients.route import ModelRouteClient
 from odahuflow.sdk.clients.deployment import ModelDeploymentClient
 
 
