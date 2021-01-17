@@ -12,7 +12,7 @@ jobs:
       - run:
           name: Check
           command: make check-vulnerabilities
-  lint:
+  lint-n-test:
     docker:
       - image: circleci/python:3.6
     steps:
@@ -23,16 +23,6 @@ jobs:
       - run:
           name: Lint
           command: make lint
-  test:
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - checkout
-      - run:
-          name: Setup
-          command: |
-            make install
-            make install-tests
       - run:
           name: Test
           command: make test
@@ -41,9 +31,6 @@ workflows:
   main:
     jobs:
       - security-check
-      - lint
+      - lint-n-test:
           requires:
             - security-check
-      - test
-          requires:
-            - lint
