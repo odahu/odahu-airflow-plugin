@@ -19,7 +19,9 @@ jobs:
       - checkout
       - run:
           name: Setup
-          command: make install
+          command: |
+            make install
+            make install-tests
       - run:
           name: Lint
           command: make lint
