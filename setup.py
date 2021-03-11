@@ -59,7 +59,7 @@ setup(
         ]
     },
     install_requires=[
-        'odahu-flow-sdk==1.4.0rc3',
+        'odahu-flow-sdk==1.4.0',
         'requests>=2.22.0'
     ],
     extras_require={
@@ -68,7 +68,7 @@ setup(
             'pytest-mock>=1.10.4',
             'pytest-cov>=2.7.1',
             'pylint>=2.3.0',
-            'apache-airflow==1.10.2',
+            'apache-airflow==1.10.14',
             'google-api-python-client'
         ]
     },
