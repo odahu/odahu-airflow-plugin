@@ -13,6 +13,8 @@
 #      See the License for the specific language governing permissions and
 #      limitations under the License.
 
+import logging
+
 from airflow.models import BaseOperator
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
@@ -21,7 +23,6 @@ from odahuflow.sdk.clients.batch_job import BatchInferenceJobClient, InferenceJo
 from odahuflow.sdk.clients.batch_service import InferenceService, BatchInferenceServiceClient
 
 from odahuflow.airflow_plugin.api import OdahuHook
-import logging
 
 
 logger = logging.getLogger(__name__)
