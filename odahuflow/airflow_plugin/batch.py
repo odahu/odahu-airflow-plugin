@@ -64,7 +64,6 @@ class InferenceServiceOperator(BaseOperator):
 class InferenceJobOperator(BaseOperator):
 
     @apply_defaults
-    @apply_defaults
     def __init__(self,
                  job: InferenceJob,
                  api_connection_id: str,
@@ -86,7 +85,6 @@ class InferenceJobOperator(BaseOperator):
         batch = client.create(self.job)
 
         logger.info(f"InferenceJob was created. id: {batch.id}")
-        context['task_instance'].xcom_push(key=XCOM_BATCH_ARTIFACT_KEY, value=batch.id)
         return batch.id
 
 
@@ -110,8 +108,7 @@ class InferenceJobSensor(BaseSensorOperator):
     def poke(self, context):
         client: BatchInferenceJobClient = self.get_hook().get_api_client(BatchInferenceJobClient)
 
-        batch_id = context['task_instance'].xcom_pull(task_ids=self.inference_job_task_id,
-                                                           key=XCOM_BATCH_ARTIFACT_KEY)
+        batch_id = context['task_instance'].xcom_pull(task_ids=self.inference_job_task_id)
 
         logger.info(f"Try to check state of Inference job {batch_id}")
 
