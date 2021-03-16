@@ -70,7 +70,7 @@ class OdahuHook(BaseHook):  # pylint: disable=abstract-method
                     'scope': extra['scope']
                 }
             )
-            if extra['client_secret']:
+            if extra.get('client_secret'):
                 self.log.warning("Please do not store secrets as a plain text. "
                                  "ODAHU Operators expect client_secret as a password field. "
                                  "Please clean client_secret from extra field.")
