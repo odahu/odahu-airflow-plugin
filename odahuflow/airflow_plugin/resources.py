@@ -16,6 +16,7 @@ def _find_absolute_resource_file(path: str) -> Union[str, None]:
     """
     Try to find absolute path for resource file
     :param path: str relative path to (the most foreground is top):
+        * "" (path is already an absolute path)
         * Airflow DAGs
         * Airflow HOME
     :return: absolute path as :str if file exists otherwise `None`
