@@ -68,7 +68,7 @@ setup(
             'pytest-mock>=1.10.4',
             'pytest-cov>=2.7.1',
             'pylint>=2.3.0',
-            'apache-airflow==2.2.2',
+            'apache-airflow==2.1.2',
             'google-api-python-client'
         ]
     },
