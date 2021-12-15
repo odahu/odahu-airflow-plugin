@@ -16,7 +16,7 @@
 import time
 
 from airflow.models import BaseOperator
-from airflow.operators.sensors import BaseSensorOperator
+from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
 from odahuflow.airflow_plugin.api import OdahuHook
 from odahuflow.airflow_plugin.packaging import XCOM_PACKAGING_RESULT_KEY
