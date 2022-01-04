@@ -14,7 +14,7 @@ COPY containers/airflow/health_check.py /home/airflow/.local/lib/python3.6/site-
 
 RUN sed -i "s|PIP_EXTRA_INDEX_URL|${PIP_EXTRA_INDEX_URL}|" ${AIRFLOW_USER_HOME}/.config/pip.conf \
  && rm /home/airflow/.local/lib/python3.6/site-packages/airflow/example_dags/t*.py \
-# && rm /home/airflow/.local/lib/python3.6/site-packages/airflow/example_dags/example*.py \
+ && rm /home/airflow/.local/lib/python3.6/site-packages/airflow/example_dags/example*.py \
  && pip install --user --upgrade pip setuptools wheel \
  && if [ -n "${AIRFLOW_DEPS}" ]; then pip install --user apache-airflow[${AIRFLOW_DEPS}]==${AIRFLOW_VERSION}; fi \
  && if [ -n "${PYTHON_DEPS}" ]; then pip install --user ${PYTHON_DEPS}; fi
