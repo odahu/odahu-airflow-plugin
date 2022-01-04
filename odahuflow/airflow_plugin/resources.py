@@ -47,7 +47,7 @@ def _build_resource_body(path_or_body: str, **template_vars) -> Tuple[str, Union
     abs_path_to_resource_file = _find_absolute_resource_file(path_or_body)
 
     if abs_path_to_resource_file:
-        with open(abs_path_to_resource_file, 'r') as data_stream:
+        with open(abs_path_to_resource_file, 'r', encoding='utf-8') as data_stream:
             resource_body_tpl = data_stream.read()
     else:
         resource_body_tpl = path_or_body

@@ -16,7 +16,7 @@
 import logging
 
 from airflow.models import BaseOperator
-from airflow.operators.sensors import BaseSensorOperator
+from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
 from odahuflow.sdk.clients.api import EntityAlreadyExists
 from odahuflow.sdk.clients.batch_job import BatchInferenceJobClient, InferenceJob, SUCCESS_STATE, FAILED_STATE

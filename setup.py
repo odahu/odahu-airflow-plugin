@@ -59,7 +59,7 @@ setup(
         ]
     },
     install_requires=[
-        'odahu-flow-sdk==1.5.0rc5',
+        'odahu-flow-sdk==1.6.0',
         'requests>=2.22.0'
     ],
     extras_require={
