@@ -3,7 +3,7 @@ FROM apache/airflow:${AIRFLOW_VERSION}-python3.6
 
 ARG AIRFLOW_USER_HOME=/home/airflow
 ARG PIP_EXTRA_INDEX_URL=""
-ARG PYTHON_DEPS=""
+ARG PYTHON_DEPS="gsutil"
 ARG AIRFLOW_DEPS=""
 
 RUN mkdir ${AIRFLOW_USER_HOME}/.config
